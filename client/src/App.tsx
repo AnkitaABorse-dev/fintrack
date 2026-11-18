@@ -3,7 +3,9 @@ import Sidebar from './components/Sidebar'
 import StatCard from './components/StatCard'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
-import type { Transaction } from './types'
+import TransactionFilters from './components/TransactionFilters'
+import { useLocalStorage } from './hooks/useLocalStorage'
+import type { Transaction, TypeFilter } from './types'
 import { formatINR } from './utils/format'
 
 const initialTransactions: Transaction[] = [
@@ -14,7 +16,12 @@ const initialTransactions: Transaction[] = [
 ]
 
 export default function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions)
+  const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
+  'fintrack:transactions',
+  initialTransactions,
+)
+const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+const [search, setSearch] = useState('')
 
   function addTransaction(t: Omit<Transaction, 'id'>) {
     setTransactions((prev) => [{ ...t, id: crypto.randomUUID() }, ...prev])
@@ -27,9 +34,20 @@ export default function App() {
   const income = transactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0)
+
   const expenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0)
+
+    const visibleTransactions = transactions.filter((t) => {
+  const matchesType = typeFilter === 'all' || t.type === typeFilter
+  const query = search.trim().toLowerCase()
+  const matchesSearch =
+    query === '' ||
+    t.title.toLowerCase().includes(query) ||
+    t.category.toLowerCase().includes(query)
+  return matchesType && matchesSearch
+})
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -44,7 +62,23 @@ export default function App() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
           <TransactionForm onAdd={addTransaction} />
-          <TransactionList transactions={transactions} onDelete={deleteTransaction} />
+          <div>
+  <TransactionFilters
+    type={typeFilter}
+    search={search}
+    onTypeChange={setTypeFilter}
+    onSearchChange={setSearch}
+  />
+  <TransactionList
+    transactions={visibleTransactions}
+    onDelete={deleteTransaction}
+    emptyMessage={
+      transactions.length > 0
+        ? 'No transactions match your filters.'
+        : undefined
+    }
+  />
+</div>
         </div>
       </main>
     </div>

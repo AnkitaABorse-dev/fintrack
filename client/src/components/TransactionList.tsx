@@ -4,13 +4,14 @@ import { formatINR } from '../utils/format'
 interface TransactionListProps {
   transactions: Transaction[]
   onDelete: (id: string) => void
+  emptyMessage?: string
 }
 
-export default function TransactionList({ transactions, onDelete }: TransactionListProps) {
+export default function TransactionList({ transactions, onDelete, emptyMessage }: TransactionListProps) {
   if (transactions.length === 0) {
     return (
       <p className="rounded-xl border border-slate-200 bg-white p-5 text-slate-500">
-        No transactions yet. Add your first one using the form.
+        {emptyMessage || "No transactions yet. Add your first one using the form."}
       </p>
     )
   }
