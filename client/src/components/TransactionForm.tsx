@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import type { SubmitEvent  } from 'react'
 import type { Transaction, TransactionType } from '../types'
+import { categories } from '../constants'
 
 interface TransactionFormProps {
   onAdd: (t: Omit<Transaction, 'id'>) => void
 }
-
-const categories = ['Food', 'Housing', 'Travel', 'Job', 'Side work', 'Other']
 
 export default function TransactionForm({ onAdd }: TransactionFormProps) {
   const [title, setTitle] = useState('')

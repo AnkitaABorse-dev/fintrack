@@ -5,7 +5,8 @@ import TransactionsPage from './pages/TransactionsPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import type { Transaction } from './types'
+import BudgetsPage from './pages/BudgetsPage'
+import type { Budgets, Transaction } from './types'
 import ReportsPage from './pages/ReportsPage'
 
 const initialTransactions: Transaction[] = [
@@ -31,6 +32,16 @@ export default function App() {
     'fintrack:transactions',
     initialTransactions,
   )
+  const [budgets, setBudgets] = useLocalStorage<Budgets>('fintrack:budgets', {})
+
+function setBudget(category: string, limit: number | null) {
+  setBudgets((prev) => {
+    const next = { ...prev }
+    if (limit === null || limit <= 0) delete next[category]
+    else next[category] = limit
+    return next
+  })
+}
 
   function addTransaction(t: Omit<Transaction, 'id'>) {
     setTransactions((prev) => [{ ...t, id: crypto.randomUUID() }, ...prev])
@@ -45,7 +56,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route
           index
-          element={<DashboardPage transactions={transactions} onDelete={deleteTransaction} />}
+          element={<DashboardPage transactions={transactions} budgets={budgets} onDelete={deleteTransaction} />}
         />
         <Route
           path="transactions"
@@ -57,7 +68,10 @@ export default function App() {
             />
           }
         />
-        <Route path="budgets" element={<PlaceholderPage title="Budgets" />} />
+        <Route
+          path="budgets"
+          element={<BudgetsPage transactions={transactions} budgets={budgets} onSetLimit={setBudget} />}
+        />
         <Route path="reports" element={<ReportsPage transactions={transactions} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
