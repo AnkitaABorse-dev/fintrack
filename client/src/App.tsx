@@ -6,8 +6,20 @@ import PlaceholderPage from './pages/PlaceholderPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import type { Transaction } from './types'
+import ReportsPage from './pages/ReportsPage'
 
 const initialTransactions: Transaction[] = [
+  { id: 's1', title: 'Salary', amount: 60000, type: 'income', category: 'Job', date: '2026-09-01' },
+  { id: 's2', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: '2026-09-03' },
+  { id: 's3', title: 'Groceries', amount: 3800, type: 'expense', category: 'Food', date: '2026-09-10' },
+  { id: 's4', title: 'Train tickets', amount: 6500, type: 'expense', category: 'Travel', date: '2026-09-18' },
+  { id: 's5', title: 'Freelance', amount: 8000, type: 'income', category: 'Side work', date: '2026-09-22' },
+  { id: 's6', title: 'Salary', amount: 60000, type: 'income', category: 'Job', date: '2026-10-01' },
+  { id: 's7', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: '2026-10-03' },
+  { id: 's8', title: 'Groceries', amount: 4500, type: 'expense', category: 'Food', date: '2026-10-09' },
+  { id: 's9', title: 'Phone recharge', amount: 799, type: 'expense', category: 'Other', date: '2026-10-12' },
+  { id: 's10', title: 'Bus pass', amount: 3200, type: 'expense', category: 'Travel', date: '2026-10-20' },
+  { id: 's11', title: 'Freelance', amount: 15000, type: 'income', category: 'Side work', date: '2026-10-25' },
   { id: '1', title: 'Salary', amount: 60000, type: 'income', category: 'Job', date: '2026-11-01' },
   { id: '2', title: 'Rent', amount: 15000, type: 'expense', category: 'Housing', date: '2026-11-03' },
   { id: '3', title: 'Groceries', amount: 4200, type: 'expense', category: 'Food', date: '2026-11-08' },
@@ -46,7 +58,7 @@ export default function App() {
           }
         />
         <Route path="budgets" element={<PlaceholderPage title="Budgets" />} />
-        <Route path="reports" element={<PlaceholderPage title="Reports" />} />
+        <Route path="reports" element={<ReportsPage transactions={transactions} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

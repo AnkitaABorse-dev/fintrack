@@ -14,12 +14,13 @@ export default function TransactionForm({ onAdd }: TransactionFormProps) {
   const [type, setType] = useState<TransactionType>('expense')
   const [category, setCategory] = useState(categories[0])
   const [error, setError] = useState('')
+  const [date, setDate] = useState(() => new Date().toLocaleDateString('en-CA'))
 
   function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const value = Number(amount)
-    if (!title.trim() || !value || value <= 0) {
-      setError('Enter a title and an amount greater than 0.')
+    if (!title.trim() || !value || value <= 0 || !date) {
+      setError('Enter a title, a date and an amount greater than 0.')
       return
     }
     onAdd({
@@ -27,7 +28,7 @@ export default function TransactionForm({ onAdd }: TransactionFormProps) {
       amount: value,
       type,
       category,
-      date: new Date().toISOString().slice(0, 10),
+      date,
     })
     setTitle('')
     setAmount('')
@@ -48,6 +49,11 @@ export default function TransactionForm({ onAdd }: TransactionFormProps) {
       <div>
         <label htmlFor="amount" className="mb-1 block text-sm text-slate-600">Amount (₹)</label>
         <input id="amount" type="number" className={field} value={amount} onChange={(e) => setAmount(e.target.value)} />
+      </div>
+
+      <div>
+        <label htmlFor="date" className="mb-1 block text-sm text-slate-600">Date</label>
+        <input id="date" type="date" className={field} value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
