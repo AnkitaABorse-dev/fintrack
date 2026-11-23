@@ -20,12 +20,14 @@ export default function TransactionList({ transactions, onDelete, emptyMessage }
     <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
       {transactions.map((t) => (
         <li key={t.id} className="flex items-center justify-between gap-4 p-4">
-          <div>
+          <div className="min-w-0">
             <p className="font-medium text-slate-900">{t.title}</p>
-            <p className="text-sm text-slate-500">{t.category} · {t.date}</p>
+            <p className="text-sm text-slate-500">
+              {t.category} · <span className="whitespace-nowrap">{t.date}</span>
+            </p>
           </div>
           <div className="flex items-center gap-4">
-            <span className={t.type === 'income' ? 'font-semibold text-green-700' : 'font-semibold text-red-700'}>
+            <span className={`whitespace-nowrap font-semibold ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
               {t.type === 'income' ? '+' : '−'}{formatINR(t.amount)}
             </span>
             <button
