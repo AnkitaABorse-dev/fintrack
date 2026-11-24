@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { api, tokenStore } from '../api'
+import { api, ApiError, tokenStore } from '../api'
 import type { User } from '../types'
 import { AuthContext } from './authContext'
 
@@ -12,15 +12,39 @@ interface AuthResponse {
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(() => tokenStore.get() !== null)
+  const [error, setError] = useState('')
+  const [attempt, setAttempt] = useState(0)
 
   // On page load, ask the server who the saved token belongs to
   useEffect(() => {
-    if (!tokenStore.get()) return
-    api<{ user: User }>('/auth/me')
-      .then((data) => setUser(data.user))
-      .catch(() => undefined)
-      .finally(() => setLoading(false))
-  }, [])
+  if (!tokenStore.get()) return
+  let cancelled = false
+
+  api<{ user: User }>('/auth/me')
+    .then((data) => {
+      if (!cancelled) setUser(data.user)
+    })
+    .catch((e) => {
+      if (cancelled) return
+      // 401 means the token is invalid. api() already cleared it, so we simply stay logged out.
+      if (!(e instanceof ApiError && e.status === 401)) {
+        setError('Could not reach the server. Please check your connection and try again.')
+      }
+    })
+    .finally(() => {
+      if (!cancelled) setLoading(false)
+    })
+
+  return () => {
+    cancelled = true
+  }
+}, [attempt])
+
+function retry() {
+  setError('')
+  setLoading(true)
+  setAttempt((n) => n + 1)
+}
 
   // Log out automatically if the API says our token is no longer valid
   useEffect(() => {
@@ -50,7 +74,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, retry, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

@@ -3,17 +3,14 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
-import type { Transaction } from '../types'
 import { formatINR } from '../utils/format'
 import { getCategoryTotals, getMonthlyTotals, getMonths, monthLabel } from '../utils/reports'
-
-interface ReportsPageProps {
-  transactions: Transaction[]
-}
+import { useFinance } from '../hooks/useFinance'
 
 const COLORS = ['#4f46e5', '#f59e0b', '#0d9488', '#db2777', '#64748b', '#0ea5e9']
 
-export default function ReportsPage({ transactions }: ReportsPageProps) {
+export default function ReportsPage() {
+  const { transactions } = useFinance()
   const [period, setPeriod] = useState('all')
 
   const monthly = getMonthlyTotals(transactions)

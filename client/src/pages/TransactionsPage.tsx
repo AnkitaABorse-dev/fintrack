@@ -2,15 +2,11 @@ import { useState } from 'react'
 import TransactionFilters from '../components/TransactionFilters'
 import TransactionForm from '../components/TransactionForm'
 import TransactionList from '../components/TransactionList'
-import type { Transaction, TypeFilter } from '../types'
+import type { TypeFilter } from '../types'
+import { useFinance } from '../hooks/useFinance'
 
-interface TransactionsPageProps {
-  transactions: Transaction[]
-  onAdd: (t: Omit<Transaction, 'id'>) => void
-  onDelete: (id: string) => void
-}
-
-export default function TransactionsPage({ transactions, onAdd, onDelete }: TransactionsPageProps) {
+export default function TransactionsPage() {
+  const { transactions, addTransaction, deleteTransaction } = useFinance()
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [search, setSearch] = useState('')
 
@@ -28,7 +24,7 @@ export default function TransactionsPage({ transactions, onAdd, onDelete }: Tran
     <>
       <h1 className="mb-6 text-2xl font-semibold text-slate-900">Transactions</h1>
       <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-        <TransactionForm onAdd={onAdd} />
+        <TransactionForm onAdd={addTransaction} />
         <div>
           <TransactionFilters
             type={typeFilter}
@@ -38,7 +34,7 @@ export default function TransactionsPage({ transactions, onAdd, onDelete }: Tran
           />
           <TransactionList
             transactions={visibleTransactions}
-            onDelete={onDelete}
+            onDelete={deleteTransaction}
             emptyMessage={
               transactions.length > 0 ? 'No transactions match your filters.' : undefined
             }

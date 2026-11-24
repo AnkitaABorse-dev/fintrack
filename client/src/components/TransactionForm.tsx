@@ -2,9 +2,10 @@ import { useState } from 'react'
 import type { SubmitEvent  } from 'react'
 import type { Transaction, TransactionType } from '../types'
 import { categories } from '../constants'
+import { ApiError } from '../api'
 
 interface TransactionFormProps {
-  onAdd: (t: Omit<Transaction, 'id'>) => void
+  onAdd: (t: Omit<Transaction, 'id'>) => Promise<void>
 }
 
 export default function TransactionForm({ onAdd }: TransactionFormProps) {
@@ -14,25 +15,28 @@ export default function TransactionForm({ onAdd }: TransactionFormProps) {
   const [category, setCategory] = useState(categories[0])
   const [error, setError] = useState('')
   const [date, setDate] = useState(() => new Date().toLocaleDateString('en-CA'))
+  const [submitting, setSubmitting] = useState(false)
 
-  function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const value = Number(amount)
-    if (!title.trim() || !value || value <= 0 || !date) {
-      setError('Enter a title, a date and an amount greater than 0.')
-      return
-    }
-    onAdd({
-      title: title.trim(),
-      amount: value,
-      type,
-      category,
-      date,
-    })
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+  e.preventDefault()
+  const value = Number(amount)
+  if (!title.trim() || !value || value <= 0 || !date) {
+    setError('Enter a title, a date and an amount greater than 0.')
+    return
+  }
+
+  setSubmitting(true)
+  try {
+    await onAdd({ title: title.trim(), amount: value, type, category, date })
     setTitle('')
     setAmount('')
     setError('')
+  } catch (err) {
+    setError(err instanceof ApiError ? err.message : 'Could not save the transaction. Please try again.')
+  } finally {
+    setSubmitting(false)
   }
+}
 
   const field = 'w-full rounded-lg border border-slate-300 px-3 py-2'
 
@@ -73,8 +77,12 @@ export default function TransactionForm({ onAdd }: TransactionFormProps) {
 
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
-      <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700">
-        Add transaction
+      <button
+        type="submit"
+        disabled={submitting}
+        className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+      >
+        {submitting ? 'Saving…' : 'Add transaction'}
       </button>
     </form>
   )

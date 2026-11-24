@@ -2,16 +2,11 @@ import { Link } from 'react-router'
 import StatCard from '../components/StatCard'
 import TransactionList from '../components/TransactionList'
 import { getBudgetRows } from '../utils/budget'
-import type { Budgets, Transaction } from '../types'
 import { formatINR } from '../utils/format'
+import { useFinance } from '../hooks/useFinance'
 
-interface DashboardPageProps {
-  transactions: Transaction[]
-  budgets: Budgets
-  onDelete: (id: string) => void
-}
-
-export default function DashboardPage({ transactions, budgets, onDelete }: DashboardPageProps) {
+export default function DashboardPage() {
+  const { transactions, budgets, deleteTransaction } = useFinance() 
   const income = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const expenses = transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
 
@@ -53,7 +48,7 @@ export default function DashboardPage({ transactions, budgets, onDelete }: Dashb
           View all
         </Link>
       </div>
-      <TransactionList transactions={recent} onDelete={onDelete} />
+      <TransactionList transactions={recent} onDelete={deleteTransaction} />
     </>
   )
 }

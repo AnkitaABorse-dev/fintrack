@@ -1,14 +1,9 @@
+import LimitForm from '../components/LimitForm'
 import { budgetCategories } from '../constants'
-import type { Budgets, Transaction } from '../types'
+import { useFinance } from '../hooks/useFinance'
 import { getBudgetStatus, getSpentByCategory } from '../utils/budget'
 import type { BudgetStatus } from '../utils/budget'
 import { formatINR } from '../utils/format'
-
-interface BudgetsPageProps {
-  transactions: Transaction[]
-  budgets: Budgets
-  onSetLimit: (category: string, limit: number | null) => void
-}
 
 const barColor: Record<BudgetStatus, string> = {
   ok: 'bg-indigo-600',
@@ -16,9 +11,9 @@ const barColor: Record<BudgetStatus, string> = {
   over: 'bg-red-600',
 }
 
-export default function BudgetsPage({ transactions, budgets, onSetLimit }: BudgetsPageProps) {
+export default function BudgetsPage() {
+  const { transactions, budgets, setBudget } = useFinance()
   const spent = getSpentByCategory(transactions)
-
   return (
     <>
       <h1 className="mb-2 text-2xl font-semibold text-slate-900">Budgets</h1>
@@ -35,21 +30,7 @@ export default function BudgetsPage({ transactions, budgets, onSetLimit }: Budge
             <li key={category} className="rounded-xl border border-slate-200 bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="font-semibold text-slate-900">{category}</h2>
-                <div className="flex items-center gap-2">
-                  <label htmlFor={`limit-${category}`} className="text-sm text-slate-600">
-                    Monthly limit (₹)
-                  </label>
-                  <input
-                    id={`limit-${category}`}
-                    type="number"
-                    min="0"
-                    className="w-32 rounded-lg border border-slate-300 px-3 py-2"
-                    value={limit ?? ''}
-                    onChange={(e) =>
-                      onSetLimit(category, e.target.value === '' ? null : Number(e.target.value))
-                    }
-                  />
-                </div>
+                <LimitForm category={category} limit={limit} onSave={setBudget} />
               </div>
 
               {limit ? (
