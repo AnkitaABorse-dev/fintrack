@@ -74,11 +74,11 @@ Content-Type: application/json
 
 ### 14. Second user lists transactions (should be empty)
 GET {{baseUrl}}/transactions
-Authorization: Bearer {{other.response.body.token}}
+Authorization: Bearer {{otherLogin.response.body.token}}
 
 ### 15. Second user tries to delete the first user's transaction
 DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
-Authorization: Bearer {{other.response.body.token}}
+Authorization: Bearer {{otherLogin.response.body.token}}
 
 ### 16. First user deletes their own transaction
 DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
@@ -86,4 +86,58 @@ Authorization: Bearer {{login.response.body.token}}
 
 ### 17. Delete again (already gone)
 DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+### 18. Set a Food limit
+PUT {{baseUrl}}/budgets/Food
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "limit": 5000 }
+
+### 19. Change the Food limit
+PUT {{baseUrl}}/budgets/Food
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "limit": 6000 }
+
+### 20. List my budgets
+GET {{baseUrl}}/budgets
+Authorization: Bearer {{login.response.body.token}}
+
+### 21. Unknown category
+PUT {{baseUrl}}/budgets/Pizza
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "limit": 1000 }
+
+### 22. Negative limit
+PUT {{baseUrl}}/budgets/Food
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "limit": -5 }
+
+### 23. No token
+GET {{baseUrl}}/budgets
+
+### 13b. Log in as the second user
+# @name otherLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "other@example.com", "password": "Password123" }
+
+### 24. Second user's budgets (should be empty)
+GET {{baseUrl}}/budgets
+Authorization: Bearer {{otherLogin.response.body.token}}
+
+### 25. Delete the Food limit
+DELETE {{baseUrl}}/budgets/Food
+Authorization: Bearer {{login.response.body.token}}
+
+### 26. List again (should be empty)
+GET {{baseUrl}}/budgets
 Authorization: Bearer {{login.response.body.token}}

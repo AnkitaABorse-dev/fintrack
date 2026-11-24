@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { errorHandler } from './middleware/errorHandler.js'
 import { authRouter } from './routes/auth.js'
 import { transactionsRouter } from './routes/transactions.js'
+import { budgetsRouter } from './routes/budgets.js'
 
 export const app = express()
 
@@ -17,5 +18,6 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRouter)
 app.use('/api/transactions', transactionsRouter)
+app.use('/api/budgets', budgetsRouter)
 
 app.use(errorHandler)

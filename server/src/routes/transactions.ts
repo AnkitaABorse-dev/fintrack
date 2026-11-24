@@ -3,10 +3,9 @@ import mongoose from 'mongoose'
 import { z } from 'zod'
 import { requireAuth } from '../middleware/auth.js'
 import { Transaction } from '../models/Transaction.js'
+import { CATEGORIES } from '../constants.js'
 
 export const transactionsRouter = Router()
-
-const CATEGORIES = ['Food', 'Housing', 'Travel', 'Job', 'Side work', 'Other'] as const
 
 const createSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(100, 'Title is too long'),
