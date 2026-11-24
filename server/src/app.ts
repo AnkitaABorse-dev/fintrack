@@ -1,5 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import { errorHandler } from './middleware/errorHandler.js'
+import { authRouter } from './routes/auth.js'
 
 export const app = express()
 
@@ -11,3 +13,7 @@ app.get('/api/health', (_req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   })
 })
+
+app.use('/api/auth', authRouter)
+
+app.use(errorHandler)

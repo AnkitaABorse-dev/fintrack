@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:5000/api
+
+### 1. Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "name": "Test User", "email": "test@example.com", "password": "Password123" }
+
+### 2. Register with a too-short password
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "name": "Short Pass", "email": "short@example.com", "password": "123" }
+
+### 3. Login with the wrong password
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "test@example.com", "password": "WrongPassword" }
+
+### 4. Login correctly
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "test@example.com", "password": "Password123" }
+
+### 5. Who am I, with the real token
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.token}}
+
+### 6. Who am I, with no token
+GET {{baseUrl}}/auth/me
+
+### 7. Who am I, with a fake token
+GET {{baseUrl}}/auth/me
+Authorization: Bearer abc.def.ghi
