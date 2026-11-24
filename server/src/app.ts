@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { errorHandler } from './middleware/errorHandler.js'
 import { authRouter } from './routes/auth.js'
+import { transactionsRouter } from './routes/transactions.js'
 
 export const app = express()
 
@@ -15,5 +16,6 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.use('/api/auth', authRouter)
+app.use('/api/transactions', transactionsRouter)
 
 app.use(errorHandler)

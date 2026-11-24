@@ -35,3 +35,55 @@ GET {{baseUrl}}/auth/me
 ### 7. Who am I, with a fake token
 GET {{baseUrl}}/auth/me
 Authorization: Bearer abc.def.ghi
+
+### 8. Add an expense
+# @name addExpense
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "title": "Groceries", "amount": 4200, "type": "expense", "category": "Food", "date": "2026-11-08" }
+
+### 9. Add with a negative amount
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "title": "Bad", "amount": -5, "type": "expense", "category": "Food", "date": "2026-11-08" }
+
+### 10. Add with an unknown category
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "title": "Bad", "amount": 50, "type": "expense", "category": "Pizza", "date": "2026-11-08" }
+
+### 11. List my transactions
+GET {{baseUrl}}/transactions
+Authorization: Bearer {{login.response.body.token}}
+
+### 12. List with no token
+GET {{baseUrl}}/transactions
+
+### 13. Register a second user
+# @name other
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "name": "Other User", "email": "other@example.com", "password": "Password123" }
+
+### 14. Second user lists transactions (should be empty)
+GET {{baseUrl}}/transactions
+Authorization: Bearer {{other.response.body.token}}
+
+### 15. Second user tries to delete the first user's transaction
+DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
+Authorization: Bearer {{other.response.body.token}}
+
+### 16. First user deletes their own transaction
+DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+### 17. Delete again (already gone)
+DELETE {{baseUrl}}/transactions/{{addExpense.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
