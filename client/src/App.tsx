@@ -8,6 +8,8 @@ import { useLocalStorage } from './hooks/useLocalStorage'
 import BudgetsPage from './pages/BudgetsPage'
 import type { Budgets, Transaction } from './types'
 import ReportsPage from './pages/ReportsPage'
+import AuthPage from './pages/AuthPage'
+import ProtectedRoute from './components/ProtectedRoute'
 
 const initialTransactions: Transaction[] = [
   { id: 's1', title: 'Salary', amount: 60000, type: 'income', category: 'Job', date: '2026-09-01' },
@@ -53,27 +55,32 @@ function setBudget(category: string, limit: number | null) {
 
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        <Route
-          index
-          element={<DashboardPage transactions={transactions} budgets={budgets} onDelete={deleteTransaction} />}
-        />
-        <Route
-          path="transactions"
-          element={
-            <TransactionsPage
-              transactions={transactions}
-              onAdd={addTransaction}
-              onDelete={deleteTransaction}
-            />
-          }
-        />
-        <Route
-          path="budgets"
-          element={<BudgetsPage transactions={transactions} budgets={budgets} onSetLimit={setBudget} />}
-        />
-        <Route path="reports" element={<ReportsPage transactions={transactions} />} />
-        <Route path="*" element={<NotFoundPage />} />
+      <Route path="login" element={<AuthPage mode="login" />} />
+      <Route path="register" element={<AuthPage mode="register" />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route
+            index
+            element={<DashboardPage transactions={transactions} budgets={budgets} onDelete={deleteTransaction} />}
+          />
+          <Route
+            path="transactions"
+            element={
+              <TransactionsPage
+                transactions={transactions}
+                onAdd={addTransaction}
+                onDelete={deleteTransaction}
+              />
+            }
+          />
+          <Route
+            path="budgets"
+            element={<BudgetsPage transactions={transactions} budgets={budgets} onSetLimit={setBudget} />}
+          />
+          <Route path="reports" element={<ReportsPage transactions={transactions} />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Route>
     </Routes>
   )
